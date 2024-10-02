@@ -35,7 +35,7 @@ contract Solution is Test {
         SAVExploit e = new SAVExploit(setup);
 
         e.solve();
-        
+
         assertTrue(setup.isSolved());
     }
 
@@ -44,7 +44,7 @@ contract Solution is Test {
         EExploit e = new EExploit(setup);
 
         e.solve();
-        
+
         assertTrue(setup.isSolved());
     }
 

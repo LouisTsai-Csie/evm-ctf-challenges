@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { IERC20 } from "./lib/IERC20.sol";
-import { VotingVault } from "./VotingVault.sol";
+import {IERC20} from "./lib/IERC20.sol";
+import {VotingVault} from "./VotingVault.sol";
 
 /// @title Treasury
 /// @notice The Treasury contract.
@@ -15,7 +15,7 @@ contract Treasury {
         uint256 blockNumber;
         uint256 votes;
     }
-    
+
     VotingVault public immutable VAULT;
 
     uint256 public immutable minimumVotes;
@@ -57,15 +57,17 @@ contract Treasury {
      */
     function propose(address token, uint256 amount, address recipient) external returns (uint256) {
         require(amount <= reserves[token], "insufficient tokens");
-        
-        proposals.push(Proposal({
-            executed: false,
-            recipient: recipient,
-            token: token,
-            amount: amount,
-            blockNumber: block.number,
-            votes: 0
-        }));
+
+        proposals.push(
+            Proposal({
+                executed: false,
+                recipient: recipient,
+                token: token,
+                amount: amount,
+                blockNumber: block.number,
+                votes: 0
+            })
+        );
 
         return proposals.length - 1;
     }
@@ -80,7 +82,7 @@ contract Treasury {
 
         uint256 blockNumber = proposals[proposalId].blockNumber;
         require(blockNumber < block.number, "same block");
-        
+
         voted[proposalId][msg.sender] = true;
 
         uint256 votingPower = VAULT.votingPower(msg.sender, blockNumber);

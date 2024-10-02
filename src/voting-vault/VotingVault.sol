@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { IERC20 } from "./lib/IERC20.sol";
-import { History } from "./History.sol";
+import {IERC20} from "./lib/IERC20.sol";
+import {History} from "./History.sol";
 
 /// @title VotingVault
 /// @notice The VotingVault contract.
@@ -19,7 +19,7 @@ contract VotingVault {
         uint256 front;
         address delegatee;
     }
-    
+
     uint256 public constant VOTE_MULTIPLIER = 1.3e18;
     uint256 public constant LOCK_DURATION = 30 days;
 
@@ -53,10 +53,9 @@ contract VotingVault {
         }
 
         uint256 previousAmount = deposits[deposits.length - 1].cumulativeAmount;
-        deposits.push(Deposit({
-            cumulativeAmount: previousAmount + amount,
-            unlockTimestamp: block.timestamp + LOCK_DURATION
-        }));
+        deposits.push(
+            Deposit({cumulativeAmount: previousAmount + amount, unlockTimestamp: block.timestamp + LOCK_DURATION})
+        );
 
         uint256 votes = _calculateVotes(amount);
         _addVotingPower(delegatee, votes);
@@ -75,14 +74,14 @@ contract VotingVault {
     function unlock(uint256 end) external returns (uint256 amount) {
         (UserData storage data, address delegatee) = _getUserData(msg.sender);
         Deposit[] storage deposits = data.deposits;
-        
+
         uint256 front = data.front;
         require(front < end, "already unlocked");
 
         Deposit memory lastUnlockedDeposit = deposits[front];
         Deposit memory depositToUnlock = deposits[end];
         require(block.timestamp > depositToUnlock.unlockTimestamp, "still locked");
-        
+
         amount = depositToUnlock.cumulativeAmount - lastUnlockedDeposit.cumulativeAmount;
         data.front = end;
 
@@ -111,7 +110,7 @@ contract VotingVault {
         Deposit storage lastUnlockedDeposit = deposits[data.front];
         Deposit storage lastDeposit = deposits[length - 1];
         uint256 amount = lastDeposit.cumulativeAmount - lastUnlockedDeposit.cumulativeAmount;
-        
+
         uint256 votes = _calculateVotes(amount);
         _subtractVotingPower(delegatee, votes);
         _addVotingPower(newDelegatee, votes);
@@ -132,18 +131,18 @@ contract VotingVault {
     }
 
     // ============================================== HELPERS ===============================================
-    
+
     function _addVotingPower(address delegatee, uint256 votes) internal {
         uint256 oldVotes = history.getLatestVotingPower(delegatee);
-        unchecked { 
-            history.push(delegatee, oldVotes + votes); 
+        unchecked {
+            history.push(delegatee, oldVotes + votes);
         }
     }
 
     function _subtractVotingPower(address delegatee, uint256 votes) internal {
         uint256 oldVotes = history.getLatestVotingPower(delegatee);
-        unchecked { 
-            history.push(delegatee, oldVotes - votes); 
+        unchecked {
+            history.push(delegatee, oldVotes - votes);
         }
     }
 
@@ -151,9 +150,7 @@ contract VotingVault {
         return amount * VOTE_MULTIPLIER / 1e18;
     }
 
-    function _getUserData(
-        address user
-    ) internal view returns (UserData storage data, address delegatee) {
+    function _getUserData(address user) internal view returns (UserData storage data, address delegatee) {
         data = userData[user];
         delegatee = data.delegatee == address(0) ? user : data.delegatee;
     }

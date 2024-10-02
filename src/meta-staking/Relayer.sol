@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
@@ -9,7 +8,7 @@ contract Relayer {
         bytes32 s;
         uint256 deadline;
     }
-    
+
     struct Transaction {
         address from;
         address to;
@@ -27,7 +26,7 @@ contract Relayer {
 
     function execute(TransactionRequest calldata request) external payable {
         require(msg.value == request.transaction.value, "Insufficient value");
-        
+
         bool success = _execute(request);
         require(success, "Execution failed");
     }
@@ -42,15 +41,14 @@ contract Relayer {
 
             totalValue += requests[i].transaction.value;
         }
-        
+
         require(msg.value == totalValue, "Execution failed");
     }
-
 
     function _execute(TransactionRequest calldata request) internal returns (bool success) {
         Transaction memory transaction = request.transaction;
         Signature memory signature = request.signature;
-        
+
         bytes32 transactionHash = keccak256(abi.encode(transaction, nonce++));
         address signer = ecrecover(transactionHash, signature.v, signature.r, signature.s);
 

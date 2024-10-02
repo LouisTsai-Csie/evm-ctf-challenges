@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { IERC20 } from "./lib/IERC20.sol";
-import { ERC20 } from "./lib/ERC20.sol";
-import { FixedPointMathLib } from "./lib/FixedPointMathLib.sol";
+import {IERC20} from "./lib/IERC20.sol";
+import {ERC20} from "./lib/ERC20.sol";
+import {FixedPointMathLib} from "./lib/FixedPointMathLib.sol";
 
 /// @title SimpleVault
 /// @notice The SimpleVault contract.
@@ -13,7 +13,7 @@ contract SimpleVault is ERC20 {
     IERC20 public immutable GREY;
 
     uint256 public totalAssets;
-    
+
     /**
      * @param _grey The GREY token address.
      */
@@ -34,7 +34,7 @@ contract SimpleVault is ERC20 {
 
         totalAssets += assets;
         _mint(msg.sender, shares);
-        
+
         GREY.transferFrom(msg.sender, address(this), assets);
     }
 

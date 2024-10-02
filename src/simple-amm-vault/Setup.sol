@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { GREY } from "./lib/GREY.sol";
-import { SimpleVault } from "./SimpleVault.sol";
-import { SimpleAMM } from "./SimpleAMM.sol";
+import {GREY} from "./lib/GREY.sol";
+import {SimpleVault} from "./SimpleVault.sol";
+import {SimpleAMM} from "./SimpleAMM.sol";
 
 contract Setup {
     bool public claimed;
 
     // GREY token
     GREY public grey;
-    
+
     // Challenge contracts
     SimpleVault public vault;
     SimpleAMM public amm;
@@ -48,7 +48,7 @@ contract Setup {
     function claim() external {
         require(!claimed, "already claimed");
         claimed = true;
-        
+
         grey.mint(msg.sender, 1000e18);
     }
 

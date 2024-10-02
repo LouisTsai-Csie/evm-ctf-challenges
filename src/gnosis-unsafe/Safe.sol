@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { ISafe } from "./interfaces/ISafe.sol";
+import {ISafe} from "./interfaces/ISafe.sol";
 
 contract Safe is ISafe {
     uint256 public constant OWNER_COUNT = 3;
@@ -36,12 +36,12 @@ contract Safe is ISafe {
      * @notice Replaces a current owner with a new owner.
      *
      * @param ownerIndex  The index of the owner to replace.
-     * @param newOwner    The new owner address.  
+     * @param newOwner    The new owner address.
      */
     function replaceOwner(uint256 ownerIndex, address newOwner) external onlySelf {
         if (ownerIndex >= OWNER_COUNT) revert InvalidIndex();
         if (newOwner == address(0)) revert OwnerCannotBeZeroAddress();
-        
+
         for (uint256 i = 0; i < OWNER_COUNT; i++) {
             if (owners[i] == newOwner) {
                 revert DuplicateOwner();
@@ -60,7 +60,7 @@ contract Safe is ISafe {
         uint256 queueTimestamp = queueHashToTimestamp[queueHash];
         if (queueTimestamp == 0) revert TransactionNotQueued();
         if (block.timestamp >= queueTimestamp + VETO_DURATION) revert NotInVetoPeriod();
-        
+
         delete queueHashToTimestamp[queueHash];
     }
 
@@ -72,7 +72,7 @@ contract Safe is ISafe {
      * @param v            The v value of signatures from all owners.
      * @param r            The r value of signatures from all owners.
      * @param s            The s value of signatures from all owners.
-     * @param transaction  The transaction to execute.  
+     * @param transaction  The transaction to execute.
      * @return queueHash   The hash of the queued transaction.
      */
     function queueTransaction(
@@ -83,12 +83,7 @@ contract Safe is ISafe {
     ) external returns (bytes32 queueHash) {
         if (!isOwner(transaction.signer)) revert SignerIsNotOwner();
 
-        queueHash = keccak256(abi.encode(
-            transaction,
-            v,
-            r,
-            s
-        ));
+        queueHash = keccak256(abi.encode(transaction, v, r, s));
 
         queueHashToTimestamp[queueHash] = block.timestamp;
     }
@@ -99,8 +94,8 @@ contract Safe is ISafe {
      * @param v               The v value of signatures from all owners.
      * @param r               The r value of signatures from all owners.
      * @param s               The s value of signatures from all owners.
-     * @param transaction     The transaction to execute.  
-     * @param signatureIndex  The index of the signature to use. 
+     * @param transaction     The transaction to execute.
+     * @param signatureIndex  The index of the signature to use.
      * @return success        Whether the executed transaction succeeded.
      * @return returndata     Return data from the executed transaction.
      */
@@ -112,13 +107,8 @@ contract Safe is ISafe {
         uint256 signatureIndex
     ) external payable returns (bool success, bytes memory returndata) {
         if (signatureIndex >= OWNER_COUNT) revert InvalidIndex();
-        
-        bytes32 queueHash = keccak256(abi.encode(
-            transaction,
-            v,
-            r,
-            s
-        ));
+
+        bytes32 queueHash = keccak256(abi.encode(transaction, v, r, s));
 
         uint256 queueTimestamp = queueHashToTimestamp[queueHash];
         if (queueTimestamp == 0) revert TransactionNotQueued();
@@ -127,16 +117,11 @@ contract Safe is ISafe {
         bytes32 txHash = keccak256(abi.encode(transaction));
         if (transactionExecuted[txHash]) revert TransactionAlreadyExecuted();
 
-        address signer = ecrecover(
-            txHash, 
-            v[signatureIndex], 
-            r[signatureIndex], 
-            s[signatureIndex]
-        );
+        address signer = ecrecover(txHash, v[signatureIndex], r[signatureIndex], s[signatureIndex]);
         if (signer != transaction.signer) revert InvalidSignature();
 
         transactionExecuted[txHash] = true;
-        (success, returndata) = transaction.to.call{ value: transaction.value }(transaction.data);
+        (success, returndata) = transaction.to.call{value: transaction.value}(transaction.data);
     }
 
     // ========================================= VIEW FUNCTIONS ========================================

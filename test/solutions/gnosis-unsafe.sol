@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { Setup, GREY, Safe } from "src/gnosis-unsafe/Setup.sol";
-import { ISafe } from "src/gnosis-unsafe/interfaces/ISafe.sol";
+import {Setup, GREY, Safe} from "src/gnosis-unsafe/Setup.sol";
+import {ISafe} from "src/gnosis-unsafe/interfaces/ISafe.sol";
 
 contract Exploit {
     Setup setup;
@@ -18,7 +18,7 @@ contract Exploit {
 
     // Execute this first
     function solvePart1() external {
-        // Create transaction that transfers 10,000 GREY tokens out 
+        // Create transaction that transfers 10,000 GREY tokens out
         transaction = ISafe.Transaction({
             signer: address(0x1337),
             to: address(setup.grey()),

@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { GREY } from "./lib/GREY.sol";
-import { Safe } from "./Safe.sol";
+import {GREY} from "./lib/GREY.sol";
+import {Safe} from "./Safe.sol";
 
 contract Setup {
     bool public claimed;
 
     // GREY token
     GREY public grey;
-    
+
     // Challenge contracts
     Safe public safe;
 
@@ -28,7 +28,7 @@ contract Setup {
     function claim() external {
         require(!claimed, "already claimed");
         claimed = true;
-        
+
         grey.mint(msg.sender, 1000e18);
     }
 

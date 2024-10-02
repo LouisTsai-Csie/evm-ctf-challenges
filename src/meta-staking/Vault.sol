@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { IERC20 } from "./interfaces/IERC20.sol";
-import { IFlashloanCallback } from "./interfaces/IFlashloanCallback.sol";
+import {IERC20} from "./interfaces/IERC20.sol";
+import {IFlashloanCallback} from "./interfaces/IFlashloanCallback.sol";
 
 contract Vault {
     IERC20 public token;

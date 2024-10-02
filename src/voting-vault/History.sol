@@ -14,11 +14,7 @@ library History {
     /**
      * @dev Pushes a (block.number, votes) checkpoint into a user's history.
      */
-    function push(
-        CheckpointHistory storage history,
-        address user,
-        uint256 votes
-    ) internal {
+    function push(CheckpointHistory storage history, address user, uint256 votes) internal {
         Checkpoint[] storage checkpoints = history.checkpoints[user];
         uint256 length = checkpoints.length;
 
@@ -30,20 +26,14 @@ library History {
         if (latestBlock == block.number) {
             checkpoints[length - 1].votes = uint224(votes);
         } else {
-            checkpoints.push(Checkpoint({
-                blockNumber: uint32(block.number),
-                votes: uint224(votes)
-            }));
+            checkpoints.push(Checkpoint({blockNumber: uint32(block.number), votes: uint224(votes)}));
         }
     }
 
     /**
      * @dev Returns votes in the last checkpoint, or zero if there is none.
      */
-    function getLatestVotingPower(
-        CheckpointHistory storage history,
-        address user
-    ) internal view returns (uint256) {
+    function getLatestVotingPower(CheckpointHistory storage history, address user) internal view returns (uint256) {
         Checkpoint[] storage checkpoints = history.checkpoints[user];
         uint256 length = checkpoints.length;
 
@@ -51,19 +41,19 @@ library History {
     }
 
     /**
-     * @dev Returns votes in the last checkpoint with blockNumber lower or equal to 
+     * @dev Returns votes in the last checkpoint with blockNumber lower or equal to
      * latestBlock, or zero if there is none.
      */
-    function getVotingPower(
-        CheckpointHistory storage history,
-        address user,
-        uint256 latestBlock
-    ) internal view returns (uint256) {
+    function getVotingPower(CheckpointHistory storage history, address user, uint256 latestBlock)
+        internal
+        view
+        returns (uint256)
+    {
         Checkpoint[] storage checkpoints = history.checkpoints[user];
 
         uint256 low = 0;
         uint256 high = checkpoints.length;
-        
+
         while (low < high) {
             uint256 mid = (high + low) / 2;
             if (checkpoints[mid].blockNumber > latestBlock) {

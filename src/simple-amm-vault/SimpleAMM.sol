@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { IERC20 } from "./lib/IERC20.sol";
-import { ERC20 } from "./lib/ERC20.sol";
-import { FixedPointMathLib } from "./lib/FixedPointMathLib.sol";
-import { ISimpleCallbacks } from "./interfaces/ISimpleCallbacks.sol";
-import { SimpleVault } from "./SimpleVault.sol";
+import {IERC20} from "./lib/IERC20.sol";
+import {ERC20} from "./lib/ERC20.sol";
+import {FixedPointMathLib} from "./lib/FixedPointMathLib.sol";
+import {ISimpleCallbacks} from "./interfaces/ISimpleCallbacks.sol";
+import {SimpleVault} from "./SimpleVault.sol";
 
 /// @title SimpleAMM
 /// @notice The SimpleAMM contract.
@@ -36,7 +36,7 @@ contract SimpleAMM is ERC20 {
     /**
      * @notice Enforces the x * y = k invariant
      */
-    modifier invariant {
+    modifier invariant() {
         _;
         require(computeK(reserveX, reserveY) >= k, "K");
     }
@@ -49,10 +49,7 @@ contract SimpleAMM is ERC20 {
      * @param amountXIn  The amount of tokenX to deposit.
      * @param amountYIn  The amount of tokenY to deposit.
      */
-    function allocate(
-        uint256 amountXIn, 
-        uint256 amountYIn
-    ) external invariant returns (uint256 shares) {
+    function allocate(uint256 amountXIn, uint256 amountYIn) external invariant returns (uint256 shares) {
         uint256 deltaK = computeK(amountXIn, amountYIn);
         shares = k == 0 ? deltaK : deltaK.mulDivDown(totalSupply, k);
 
@@ -72,17 +69,14 @@ contract SimpleAMM is ERC20 {
      * @param amountXOut  The amount of tokenX to withdraw.
      * @param amountYOut  The amount of tokenY to withdraw.
      */
-    function deallocate(
-        uint256 amountXOut,
-        uint256 amountYOut
-    ) external invariant returns (uint256 shares) {
+    function deallocate(uint256 amountXOut, uint256 amountYOut) external invariant returns (uint256 shares) {
         uint256 deltaK = computeK(amountXOut, amountYOut);
         shares = deltaK.mulDivUp(totalSupply, k);
-        
+
         reserveX -= amountXOut;
         reserveY -= amountYOut;
         k -= deltaK;
-        
+
         _burn(msg.sender, shares);
 
         tokenX.transfer(msg.sender, amountXOut);
@@ -121,13 +115,9 @@ contract SimpleAMM is ERC20 {
      *
      * @param isTokenX  Whether the token to loan is tokenX or tokenY.
      * @param amount    The amount of tokens to loan.
-     * @param data      Arbitrary data passed to the callback. 
+     * @param data      Arbitrary data passed to the callback.
      */
-    function flashLoan(
-        bool isTokenX, 
-        uint256 amount, 
-        bytes calldata data
-    ) external invariant {
+    function flashLoan(bool isTokenX, uint256 amount, bytes calldata data) external invariant {
         IERC20 token = isTokenX ? tokenX : tokenY;
         token.transfer(msg.sender, amount);
 
@@ -135,7 +125,7 @@ contract SimpleAMM is ERC20 {
 
         token.transferFrom(msg.sender, address(this), amount);
     }
-    
+
     // ========================================= HELPERS ========================================
 
     function computeK(uint256 amountX, uint256 amountY) internal view returns (uint256) {

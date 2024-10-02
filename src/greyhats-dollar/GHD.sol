@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { IERC20 } from "./lib/IERC20.sol";
-import { FixedPointMathLib } from "./lib/FixedPointMathLib.sol";
+import {IERC20} from "./lib/IERC20.sol";
+import {FixedPointMathLib} from "./lib/FixedPointMathLib.sol";
 
 /// @title GHD
 /// @notice The GHD contract.
 contract GHD {
     using FixedPointMathLib for uint256;
 
-    string constant public name     = "GreyHats Dollar";
-    string constant public symbol   = "GHD";
-    uint8  constant public decimals = 18;
+    string public constant name = "GreyHats Dollar";
+    string public constant symbol = "GHD";
+    uint8 public constant decimals = 18;
 
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event Approval(address indexed owner, address indexed spender, uint256 amount);
@@ -43,19 +43,19 @@ contract GHD {
         deflationRatePerSecond = _deflationRate / ONE_YEAR;
         lastUpdated = block.timestamp;
     }
-    
+
     // ========================================= MODIFIERS ========================================
 
     /**
      * @notice Updates the conversion rate between GHD and the underlying asset.
      */
-    modifier update {
+    modifier update() {
         conversionRate = _conversionRate();
         lastUpdated = block.timestamp;
-        
+
         _;
     }
-    
+
     // ========================================= MUTATIVE FUNCTIONS ========================================
 
     /**
@@ -109,25 +109,15 @@ contract GHD {
      * @param amount  The amount of GHD to transfer.
      * @return        Whether the transfer succeeded.
      */
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) public update returns (bool) {
+    function transferFrom(address from, address to, uint256 amount) public update returns (bool) {
         if (from != msg.sender) allowance[from][msg.sender] -= amount;
 
         uint256 _shares = _GHDToShares(amount, conversionRate, false);
         uint256 fromShares = shares[from] - _shares;
         uint256 toShares = shares[to] + _shares;
-        
-        require(
-            _sharesToGHD(fromShares, conversionRate, false) < balanceOf(from),
-            "amount too small"
-        );
-        require(
-            _sharesToGHD(toShares, conversionRate, false) > balanceOf(to),
-            "amount too small"
-        );
+
+        require(_sharesToGHD(fromShares, conversionRate, false) < balanceOf(from), "amount too small");
+        require(_sharesToGHD(toShares, conversionRate, false) > balanceOf(to), "amount too small");
 
         shares[from] = fromShares;
         shares[to] = toShares;
@@ -146,7 +136,7 @@ contract GHD {
      */
     function approve(address spender, uint256 amount) external returns (bool) {
         allowance[msg.sender][spender] = amount;
-        
+
         emit Approval(msg.sender, spender, amount);
 
         return true;
@@ -163,7 +153,7 @@ contract GHD {
     function balanceOf(address user) public view returns (uint256) {
         return _sharesToGHD(shares[user], _conversionRate(), false);
     }
-    
+
     /**
      * @notice Calculate the total supply of GHD.
      *
@@ -181,19 +171,11 @@ contract GHD {
         return conversionRate - conversionRate.mulWadDown(multiplier);
     }
 
-    function _sharesToGHD(
-        uint256 _shares, 
-        uint256 _rate,
-        bool roundUp
-    ) internal pure returns (uint256) {
+    function _sharesToGHD(uint256 _shares, uint256 _rate, bool roundUp) internal pure returns (uint256) {
         return roundUp ? _shares.mulWadUp(_rate) : _shares.mulWadDown(_rate);
     }
 
-    function _GHDToShares(
-        uint256 _balance, 
-        uint256 _rate,
-        bool roundUp
-    ) internal pure returns (uint256) {
+    function _GHDToShares(uint256 _balance, uint256 _rate, bool roundUp) internal pure returns (uint256) {
         return roundUp ? _balance.divWadUp(_rate) : _balance.divWadDown(_rate);
     }
 }

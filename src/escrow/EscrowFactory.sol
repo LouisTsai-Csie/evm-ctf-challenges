@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import { ERC721 } from "./lib/ERC721.sol";
-import { ClonesWithImmutableArgs } from "./lib/ClonesWithImmutableArgs.sol";
-import { IEscrow } from "./interfaces/IEscrow.sol";
+import {ERC721} from "./lib/ERC721.sol";
+import {ClonesWithImmutableArgs} from "./lib/ClonesWithImmutableArgs.sol";
+import {IEscrow} from "./interfaces/IEscrow.sol";
 
 contract EscrowFactory is ERC721 {
     using ClonesWithImmutableArgs for address;
@@ -16,12 +16,12 @@ contract EscrowFactory is ERC721 {
 
     address[] public escrowImpls;
 
-    mapping(bytes32 => bool) public deployedParams; 
+    mapping(bytes32 => bool) public deployedParams;
 
     constructor() ERC721("EscrowFactory NFT", "EFT") {
         owner = msg.sender;
     }
-    
+
     // ======================================= PERMISSIONED FUNCTIONS ======================================
 
     /**
@@ -31,7 +31,7 @@ contract EscrowFactory is ERC721 {
      */
     function addImplementation(address impl) external {
         if (msg.sender != owner) revert NotOwner();
-        
+
         escrowImpls.push(impl);
     }
 
@@ -41,12 +41,9 @@ contract EscrowFactory is ERC721 {
      * @notice Deploy an escrow.
      *
      * @param implId  The index of the escrow implementation in the escrowImpls array.
-     * @param args    The immutable arguments to deploy the escrow with.  
+     * @param args    The immutable arguments to deploy the escrow with.
      */
-    function deployEscrow(
-        uint256 implId,
-        bytes memory args
-    ) external returns (uint256 escrowId, address escrow) {
+    function deployEscrow(uint256 implId, bytes memory args) external returns (uint256 escrowId, address escrow) {
         // Get the hash of the (implId, args) pair
         bytes32 paramsHash = keccak256(abi.encodePacked(implId, args));
 
@@ -55,7 +52,7 @@ contract EscrowFactory is ERC721 {
 
         // Mark the (implId, args) pair as deployed
         deployedParams[paramsHash] = true;
-        
+
         // Grab the implementation contract for the given implId
         address impl = escrowImpls[implId];
 

@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { GREY } from "./lib/GREY.sol";
-import { VotingVault } from "./VotingVault.sol";
-import { Treasury } from "./Treasury.sol";
+import {GREY} from "./lib/GREY.sol";
+import {VotingVault} from "./VotingVault.sol";
+import {Treasury} from "./Treasury.sol";
 
 contract Setup {
     bool public claimed;
 
     // GREY token
     GREY public grey;
-    
+
     // Challenge contracts
     VotingVault public vault;
     Treasury public treasury;
@@ -41,7 +41,7 @@ contract Setup {
     function claim() external {
         require(!claimed, "already claimed");
         claimed = true;
-        
+
         grey.mint(msg.sender, 1000e18);
     }
 

@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { GREY } from "./lib/GREY.sol";
-import { Relayer } from "./Relayer.sol";
-import { Staking } from "./Staking.sol";
+import {GREY} from "./lib/GREY.sol";
+import {Relayer} from "./Relayer.sol";
+import {Staking} from "./Staking.sol";
 
 contract Setup {
     bool public claimed;
 
     // GREY token
     GREY public grey;
-    
+
     // Challenge contracts
     Relayer public relayer;
     Staking public staking;
@@ -33,7 +33,7 @@ contract Setup {
     function claim() external {
         require(!claimed, "already claimed");
         claimed = true;
-        
+
         grey.mint(msg.sender, 1000e18);
     }
 

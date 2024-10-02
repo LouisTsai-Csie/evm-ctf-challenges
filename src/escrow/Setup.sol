@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { GREY } from "./lib/GREY.sol";
-import { EscrowFactory } from "./EscrowFactory.sol";
-import { DualAssetEscrow } from "./DualAssetEscrow.sol";
+import {GREY} from "./lib/GREY.sol";
+import {EscrowFactory} from "./EscrowFactory.sol";
+import {DualAssetEscrow} from "./DualAssetEscrow.sol";
 
 contract Setup {
     bool public claimed;
 
     // GREY token
     GREY public grey;
-    
+
     // Challenge contracts
     EscrowFactory public factory;
 
@@ -34,7 +34,7 @@ contract Setup {
 
         // Deploy a DualAssetEscrow
         (escrowId, escrow) = factory.deployEscrow(
-            0,  // implId = 0
+            0, // implId = 0
             abi.encodePacked(address(grey), address(0)) // tokenX = GREY, tokenY = ETH
         );
 
@@ -50,7 +50,7 @@ contract Setup {
     function claim() external {
         require(!claimed, "already claimed");
         claimed = true;
-        
+
         grey.mint(msg.sender, 1000e18);
     }
 
